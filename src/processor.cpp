@@ -1,17 +1,22 @@
+#include <thread>
+#include <chrono>
+
 #include "processor.h"
 #include "linux_parser.h"
-#include <chrono>
-#include <thread>
+
 
 // TODO: Return the aggregate CPU utilization
 float Processor::Utilization() { 
-  auto prev_total = LinuxParser::Jiffies();
-  auto prev_active = LinuxParser::ActiveJiffies();
+  long preTotal = LinuxParser::Jiffies();
+  long preIdle = LinuxParser::IdleJiffies();
+  
   // sleep for 100ms
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  auto total = LinuxParser::Jiffies();
-  auto active = LinuxParser::ActiveJiffies();
-  auto total_diff = total - prev_total;
-  auto active_diff = active - prev_active;
-  return active_diff* 1.0 / total_diff;
+  
+  long total = LinuxParser::Jiffies();
+  long idle = LinuxParser::IdleJiffies();
+  
+  long total_differ = total - preTotal;
+  long idle_differ = idle - preIdle;
+  return 1.0 * (total_differ - idle_differ) / total_differ; 
 }
